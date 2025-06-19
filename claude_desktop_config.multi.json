@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "lumina-docs": {
+      "command": "/usr/bin/python3",
+      "args": ["-m", "doc_manager"],
+      "cwd": "/path/to/lumina-docs",
+      "env": {
+        "PYTHONPATH": "/path/to/lumina-docs/src",
+        "DOC_MANAGER_DB_PATH": "/path/to/lumina-docs/database/documents.db",
+        "DOC_MANAGER_EXPORT_DIR": "/Users/username/Desktop",
+        "DOC_MANAGER_DATA_DIR": "/path/to/lumina-docs",
+        "LUMINA_DOCS_SERVER_NAME": "lumina-docs",
+        "DOC_MANAGER_DEBUG": "false",
+        "DOC_MANAGER_LOG_LEVEL": "INFO"
+      }
+    },
+    "mcp-filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/allowed/files"]
+    },
+    "mcp-brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "your-api-key-here"
+      }
+    },
+    "mcp-postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://username:password@localhost/dbname"]
+    }
+  }
+}

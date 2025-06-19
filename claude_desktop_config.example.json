@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "lumina-docs": {
+      "command": "YOUR_PYTHON_PATH_HERE",
+      "args": [
+        "-m",
+        "doc_manager"
+      ],
+      "cwd": "YOUR_PROJECT_PATH_HERE",
+      "env": {
+        "PYTHONPATH": "YOUR_PROJECT_PATH_HERE/src",
+        "DOC_MANAGER_DB_PATH": "YOUR_PROJECT_PATH_HERE/database/documents.db",
+        "DOC_MANAGER_EXPORT_DIR": "YOUR_EXPORT_DIRECTORY_HERE",
+        "DOC_MANAGER_DATA_DIR": "YOUR_PROJECT_PATH_HERE",
+        "LUMINA_DOCS_SERVER_NAME": "lumina-docs",
+        "DOC_MANAGER_DEBUG": "false",
+        "DOC_MANAGER_LOG_LEVEL": "INFO"
+      }
+    },
+    "comment": "Common Python paths:",
+    "comment-system-macos": "/usr/bin/python3",
+    "comment-system-linux": "/usr/bin/python3", 
+    "comment-homebrew-macos": "/opt/homebrew/bin/python3",
+    "comment-conda": "/Users/username/miniconda/bin/python",
+    "comment-pyenv": "/Users/username/.pyenv/versions/3.11.0/bin/python"
+  }
+}

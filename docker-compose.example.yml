@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  lumina-docs:
+    build: .
+    environment:
+      # 数据库配置
+      DOC_MANAGER_DB_PATH: "/app/data/documents.db"
+      
+      # 导出目录配置
+      DOC_MANAGER_EXPORT_DIR: "/app/data/exports"
+      
+      # 数据目录配置
+      DOC_MANAGER_DATA_DIR: "/app/data"
+      
+      # 服务器配置
+      LUMINA_DOCS_SERVER_NAME: "lumina-docs"
+      
+      # 调试和日志配置
+      DOC_MANAGER_DEBUG: "false"
+      DOC_MANAGER_LOG_LEVEL: "INFO"
+    
+    volumes:
+      # 持久化数据目录
+      - ./data:/app/data
+      
+      # 导出文件目录（可选，如果需要在主机访问导出文件）
+      - ./exports:/app/data/exports
+    
+    ports:
+      # 如果需要 HTTP 接口（可选）
+      - "8080:8080"
+    
+    restart: unless-stopped
+
+# 开发环境配置
+  lumina-docs-dev:
+    build: .
+    environment:
+      DOC_MANAGER_DEBUG: "true"
+      DOC_MANAGER_LOG_LEVEL: "DEBUG"
+      DOC_MANAGER_DB_PATH: "/app/data/dev-documents.db"
+      DOC_MANAGER_EXPORT_DIR: "/app/data/dev-exports"
+      DOC_MANAGER_DATA_DIR: "/app/data"
+    volumes:
+      - ./data:/app/data
+      - .:/app  # 用于开发时代码热重载
+    profiles:
+      - dev
