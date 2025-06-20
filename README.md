@@ -6,22 +6,30 @@
 
 ## 核心特性
 
-🚀 **解决核心问题**
+**解决核心问题**
+
 我是一个PM，最近尝试用 Claude Code 去写Markdown 格式的需求文档，它的工作完成得还可以，但当文档规模越来越大的时候，会导致 Tokens 超出限制的问题，也会导致文档结构极度混乱。
 好在需求文档是一种结构化的文档，在编写的时候往往只需要关注当前正在编辑的部分，无需每次都阅读全文，正是在这个思路之下，我使用 Claude Code 做了这样一个 MCP Server 它能够解决的问题是：
 - ✅ 解决大文档token超长问题
 - ✅ 通过结构化查询保证内容一致性  
 - ✅ 支持模块化文档管理
 - ✅ 智能的内容参考和模式匹配
+
 **这是一个专门为大语言模型定制的方案！！！！**
-🔧
- **技术特性**
+
+**技术特性**
 - 基于SQLite的轻量级数据库设计
 - MCP协议标准化接口
 - 父子层级关系管理
 - 灵活的元数据支持
 - 强大的结构化查询能力
 - 纯 Claude Code 编写
+
+## 使用方法
+Lumina Docs 提供了一个简单易用的文档管理系统，支持通过MCP协议与Claude Desktop集成。从使用场景角度来说，它在阅读/更新/从头编写三个场景下能够为利用大语言模型处理大规模文档提供支持，具体来说：
+1. **阅读大文档**：通过结构化查询，快速定位到需要的内容，避免一次性加载整个文档。例如对于前端模块的需求文档，可以直接查询到所有相关的业务流程说明和数据展示规则，而无需浏览整个文档。
+2. **更新现有内容**：在修改某个功能模块时，可以直接查询到相关的业务流程和数据展示规则，确保修改时遵循现有的格式和内容规范。例如在更新系统状态统计功能时，可以先让大语言模型通过 SQL 直接定位到要修改的内容，避免一次加载全部文档。
+3. **从头编写新内容**：在编写新的业务流程说明时，可以参考现有的模式，确保新内容与现有内容保持一致。例如在编写新的业务流程说明时，可以先让大语言模型查询到所有现有的业务流程说明，分析其格式和内容，然后创建新的节点时遵循相同的格式和内容规范。
 
 ## 快速开始
 
@@ -44,18 +52,7 @@ cp .env.example .env
 nano .env
 ```
 
-### 3. 创建示例数据
-```bash
-cd examples
-python sample_data.py
-```
-
-### 4. 启动MCP服务器
-```bash
-python -m doc_manager
-```
-
-### 5. 配置Claude Desktop
+### 3. 配置Claude Desktop
 #### 方式1: 自动安装（推荐）
 ```bash
 # 自动配置到Claude Desktop
@@ -71,7 +68,27 @@ which python3
 which python
 ```
 
-然后编辑 Claude Desktop 配置文件 `~/Library/Application Support/Claude/claude_desktop_config.json`，添加或更新 lumina-docs 配置。
+然后编辑 Claude Desktop 配置文件：
+```json
+{
+  "mcpServers": {
+    "lumina-docs": {
+      "command": "/usr/bin/python3",
+      "args": ["-m", "doc_manager"],
+      "cwd": "/path/to/lumina-docs",
+      "env": {
+        "PYTHONPATH": "/path/to/lumina-docs/src",
+        "DOC_MANAGER_DB_PATH": "/path/to/lumina-docs/database/documents.db",
+        "DOC_MANAGER_EXPORT_DIR": "/path/to/exports",
+        "DOC_MANAGER_DATA_DIR": "/path/to/lumina-docs",
+        "LUMINA_DOCS_SERVER_NAME": "lumina-docs",
+        "DOC_MANAGER_DEBUG": "false",
+        "DOC_MANAGER_LOG_LEVEL": "INFO"
+      }
+    }
+  }
+}
+```
 
 ### 6. 使用命令行工具
 ```bash
@@ -144,223 +161,6 @@ export DOC_MANAGER_EXPORT_DIR="/home/user/Documents/exports"
 ```
 
 > **注意**: 请使用系统中实际的 Python 路径，如 `/usr/bin/python3`、`/usr/local/bin/python3` 或 conda 环境的完整路径。
-
-### 部署配置示例
-
-#### 开发环境
-```bash
-DOC_MANAGER_DEBUG=true
-DOC_MANAGER_LOG_LEVEL=DEBUG
-DOC_MANAGER_DB_PATH=./dev-database.db
-```
-
-#### 生产环境
-```bash
-DOC_MANAGER_DATA_DIR=/var/lib/doc-manager
-DOC_MANAGER_DB_PATH=/var/lib/doc-manager/database/documents.db
-DOC_MANAGER_EXPORT_DIR=/var/lib/doc-manager/exports
-DOC_MANAGER_LOG_LEVEL=WARNING
-```
-
-#### Docker部署
-```yaml
-# docker-compose.yml
-services:
-  document-manager:
-    image: doc-manager:latest
-    environment:
-      DOC_MANAGER_DB_PATH: "/app/data/documents.db"
-      DOC_MANAGER_EXPORT_DIR: "/app/data/exports"
-      DOC_MANAGER_DATA_DIR: "/app/data"
-    volumes:
-      - ./data:/app/data
-```
-
-#### 多用户环境
-```bash
-DOC_MANAGER_DATA_DIR=/home/$USER/.local/share/doc-manager
-DOC_MANAGER_EXPORT_DIR=/home/$USER/Documents/doc-manager-exports
-```
-
-## Claude Desktop MCP Server 配置示例
-
-### 完整配置示例
-
-以下是完整的 Claude Desktop 配置文件示例，展示如何将 document-manager 与其他 MCP 服务器一起配置：
-
-```json
-{
-  "mcpServers": {
-    "document-manager": {
-      "command": "/usr/bin/python3",
-      "args": ["-m", "doc_manager"],
-      "cwd": "/path/to/doc-manager",
-      "env": {
-        "PYTHONPATH": "/path/to/doc-manager/src",
-        "DOC_MANAGER_DB_PATH": "/path/to/doc-manager/database/documents.db",
-        "DOC_MANAGER_EXPORT_DIR": "/Users/username/Desktop",
-        "DOC_MANAGER_DATA_DIR": "/path/to/doc-manager",
-        "DOC_MANAGER_SERVER_NAME": "document-manager",
-        "DOC_MANAGER_DEBUG": "false",
-        "DOC_MANAGER_LOG_LEVEL": "INFO"
-      }
-    },
-    "other-mcp-server": {
-      "command": "node",
-      "args": ["/path/to/other-server/index.js"]
-    }
-  }
-}
-```
-
-### 常见 Python 路径配置
-
-根据你的 Python 安装方式，选择合适的配置：
-
-#### 系统 Python (macOS)
-```json
-{
-  "command": "/usr/bin/python3",
-  "args": ["-m", "doc_manager"]
-}
-```
-
-#### 系统 Python (Linux)
-```json
-{
-  "command": "/usr/bin/python3",
-  "args": ["-m", "doc_manager"]
-}
-```
-
-#### Homebrew Python (macOS)
-```json
-{
-  "command": "/opt/homebrew/bin/python3",
-  "args": ["-m", "doc_manager"]
-}
-```
-
-#### Conda 环境
-```json
-{
-  "command": "/Users/username/miniconda/bin/python",
-  "args": ["-m", "doc_manager"]
-}
-```
-
-#### pyenv Python
-```json
-{
-  "command": "/Users/username/.pyenv/versions/3.11.0/bin/python",
-  "args": ["-m", "doc_manager"]
-}
-```
-
-### 不同场景的配置
-
-#### 开发环境配置
-```json
-{
-  "mcpServers": {
-    "document-manager-dev": {
-      "command": "/usr/bin/python3",
-      "args": ["-m", "doc_manager"],
-      "cwd": "/path/to/doc-manager",
-      "env": {
-        "PYTHONPATH": "/path/to/doc-manager/src",
-        "DOC_MANAGER_DEBUG": "true",
-        "DOC_MANAGER_LOG_LEVEL": "DEBUG",
-        "DOC_MANAGER_DB_PATH": "/path/to/doc-manager/dev-database.db",
-        "DOC_MANAGER_EXPORT_DIR": "/path/to/dev-exports"
-      }
-    }
-  }
-}
-```
-
-#### 生产环境配置
-```json
-{
-  "mcpServers": {
-    "document-manager": {
-      "command": "/usr/bin/python3",
-      "args": ["-m", "doc_manager"],
-      "cwd": "/opt/doc-manager",
-      "env": {
-        "PYTHONPATH": "/opt/doc-manager/src",
-        "DOC_MANAGER_DATA_DIR": "/var/lib/doc-manager",
-        "DOC_MANAGER_DB_PATH": "/var/lib/doc-manager/database/documents.db",
-        "DOC_MANAGER_EXPORT_DIR": "/var/lib/doc-manager/exports",
-        "DOC_MANAGER_LOG_LEVEL": "WARNING"
-      }
-    }
-  }
-}
-```
-
-#### 多用户环境配置
-```json
-{
-  "mcpServers": {
-    "document-manager": {
-      "command": "/usr/bin/python3",
-      "args": ["-m", "doc_manager"],
-      "cwd": "/opt/doc-manager",
-      "env": {
-        "PYTHONPATH": "/opt/doc-manager/src",
-        "DOC_MANAGER_DATA_DIR": "/home/$USER/.local/share/doc-manager",
-        "DOC_MANAGER_EXPORT_DIR": "/home/$USER/Documents/doc-manager-exports"
-      }
-    }
-  }
-}
-```
-
-### 故障排除
-
-#### 查找正确的 Python 路径
-```bash
-# 查找 Python 3 路径
-which python3
-
-# 查找 Python 路径 (如果使用 conda)
-which python
-
-# 查看 Python 版本
-python3 --version
-```
-
-#### 测试配置
-```bash
-# 切换到项目目录
-cd /path/to/doc-manager
-
-# 测试模块导入
-PYTHONPATH=/path/to/doc-manager/src python3 -c "import doc_manager; print('导入成功')"
-
-# 测试服务器启动
-PYTHONPATH=/path/to/doc-manager/src python3 -m doc_manager --help
-```
-
-#### 查看日志
-Claude Desktop 的 MCP 服务器日志位置：
-- **macOS**: `~/Library/Logs/Claude/mcp-server-document-manager.log`
-- **Linux**: `~/.local/share/Claude/logs/mcp-server-document-manager.log`
-
-#### 常见错误及解决方案
-
-1. **`spawn python ENOENT`**
-   - 原因：找不到 python 命令
-   - 解决：使用完整的 Python 路径，如 `/usr/bin/python3`
-
-2. **`No module named doc_manager`**
-   - 原因：PYTHONPATH 配置错误
-   - 解决：确保 PYTHONPATH 指向正确的 src 目录
-
-3. **权限错误**
-   - 原因：数据库或导出目录权限不足
-   - 解决：检查目录权限，确保 Claude Desktop 可以读写
 
 ### 配置验证
 

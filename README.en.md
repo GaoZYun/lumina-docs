@@ -6,7 +6,8 @@ An intelligent structured document management system using the MCP protocol, des
 
 ## Core Features
 
-🚀 **Solving Core Problems**
+**Solving Core Problems**
+
 As a PM, I recently tried using Claude Code to write Markdown requirement documents. It worked well, but when the document scale grew larger, it would cause token overflow issues and make the document structure extremely chaotic.
 Fortunately, requirement documents are structured documents. When writing, you often only need to focus on the part currently being edited, without needing to read the entire document every time. Based on this idea, I used Claude Code to create this MCP Server, which can solve the following problems:
 - ✅ Solve large document token overflow issues
@@ -14,9 +15,9 @@ Fortunately, requirement documents are structured documents. When writing, you o
 - ✅ Support modular document management
 - ✅ Intelligent content reference and pattern matching
 
-"This is a solution specifically customized for large language models!!!!"
+**This is a solution specifically customized for large language models!!!!**
 
-🔧 **Technical Features**
+**Technical Features**
 - Lightweight database design based on SQLite
 - Standardized interface using MCP protocol
 - Parent-child hierarchical relationship management
@@ -30,7 +31,7 @@ Fortunately, requirement documents are structured documents. When writing, you o
 ```bash
 # Clone or download the project
 git clone <repository-url>
-cd lumina-docs
+cd doc-manager
 
 # Install dependencies
 pip install -e .
@@ -45,18 +46,7 @@ cp .env.example .env
 nano .env
 ```
 
-### 3. Create Sample Data
-```bash
-cd examples
-python sample_data.py
-```
-
-### 4. Start MCP Server
-```bash
-python -m doc_manager
-```
-
-### 5. Configure Claude Desktop
+### 3. Configure Claude Desktop
 #### Method 1: Automatic Installation (Recommended)
 ```bash
 # Automatically configure to Claude Desktop
@@ -72,9 +62,29 @@ which python3
 which python
 ```
 
-Then edit the Claude Desktop configuration file `~/Library/Application Support/Claude/claude_desktop_config.json`, add or update the lumina-docs configuration.
+Then edit the Claude Desktop configuration file:
+```json
+{
+  "mcpServers": {
+    "lumina-docs": {
+      "command": "/usr/bin/python3",
+      "args": ["-m", "doc_manager"],
+      "cwd": "/path/to/doc-manager",
+      "env": {
+        "PYTHONPATH": "/path/to/doc-manager/src",
+        "DOC_MANAGER_DB_PATH": "/path/to/doc-manager/database/documents.db",
+        "DOC_MANAGER_EXPORT_DIR": "/path/to/exports",
+        "DOC_MANAGER_DATA_DIR": "/path/to/doc-manager",
+        "LUMINA_DOCS_SERVER_NAME": "lumina-docs",
+        "DOC_MANAGER_DEBUG": "false",
+        "DOC_MANAGER_LOG_LEVEL": "INFO"
+      }
+    }
+  }
+}
+```
 
-### 6. Use Command Line Tools
+### 4. Use Command Line Tools
 ```bash
 # View document tree structure
 python -m doc_manager.cli tree
@@ -118,7 +128,7 @@ DOC_MANAGER_DEBUG=true
 
 **Method 2: System environment variables**
 ```bash
-export DOC_MANAGER_DB_PATH="/var/lib/lumina-docs/documents.db"
+export DOC_MANAGER_DB_PATH="/var/lib/doc-manager/documents.db"
 export DOC_MANAGER_EXPORT_DIR="/home/user/Documents/exports"
 ```
 
@@ -157,9 +167,9 @@ DOC_MANAGER_DB_PATH=./dev-database.db
 
 #### Production Environment
 ```bash
-DOC_MANAGER_DATA_DIR=/var/lib/lumina-docs
-DOC_MANAGER_DB_PATH=/var/lib/lumina-docs/database/documents.db
-DOC_MANAGER_EXPORT_DIR=/var/lib/lumina-docs/exports
+DOC_MANAGER_DATA_DIR=/var/lib/doc-manager
+DOC_MANAGER_DB_PATH=/var/lib/doc-manager/database/documents.db
+DOC_MANAGER_EXPORT_DIR=/var/lib/doc-manager/exports
 DOC_MANAGER_LOG_LEVEL=WARNING
 ```
 
@@ -167,8 +177,8 @@ DOC_MANAGER_LOG_LEVEL=WARNING
 ```yaml
 # docker-compose.yml
 services:
-  lumina-docs:
-    image: lumina-docs:latest
+  doc-manager:
+    image: doc-manager:latest
     environment:
       DOC_MANAGER_DB_PATH: "/app/data/documents.db"
       DOC_MANAGER_EXPORT_DIR: "/app/data/exports"
@@ -179,15 +189,15 @@ services:
 
 #### Multi-user Environment
 ```bash
-DOC_MANAGER_DATA_DIR=/home/$USER/.local/share/lumina-docs
-DOC_MANAGER_EXPORT_DIR=/home/$USER/Documents/lumina-docs-exports
+DOC_MANAGER_DATA_DIR=/home/$USER/.local/share/doc-manager
+DOC_MANAGER_EXPORT_DIR=/home/$USER/Documents/doc-manager-exports
 ```
 
 ## Claude Desktop MCP Server Configuration Examples
 
 ### Complete Configuration Example
 
-The following is a complete Claude Desktop configuration file example, showing how to configure lumina-docs with other MCP servers:
+The following is a complete Claude Desktop configuration file example, showing how to configure doc-manager with other MCP servers:
 
 ```json
 {
@@ -195,12 +205,12 @@ The following is a complete Claude Desktop configuration file example, showing h
     "lumina-docs": {
       "command": "/usr/bin/python3",
       "args": ["-m", "doc_manager"],
-      "cwd": "/path/to/lumina-docs",
+      "cwd": "/path/to/doc-manager",
       "env": {
-        "PYTHONPATH": "/path/to/lumina-docs/src",
-        "DOC_MANAGER_DB_PATH": "/path/to/lumina-docs/database/documents.db",
+        "PYTHONPATH": "/path/to/doc-manager/src",
+        "DOC_MANAGER_DB_PATH": "/path/to/doc-manager/database/documents.db",
         "DOC_MANAGER_EXPORT_DIR": "/Users/username/Desktop",
-        "DOC_MANAGER_DATA_DIR": "/path/to/lumina-docs",
+        "DOC_MANAGER_DATA_DIR": "/path/to/doc-manager",
         "LUMINA_DOCS_SERVER_NAME": "lumina-docs",
         "DOC_MANAGER_DEBUG": "false",
         "DOC_MANAGER_LOG_LEVEL": "INFO"
@@ -275,13 +285,13 @@ python3 --version
 #### Test Configuration
 ```bash
 # Change to project directory
-cd /path/to/lumina-docs
+cd /path/to/doc-manager
 
 # Test module import
-PYTHONPATH=/path/to/lumina-docs/src python3 -c "import doc_manager; print('Import successful')"
+PYTHONPATH=/path/to/doc-manager/src python3 -c "import doc_manager; print('Import successful')"
 
 # Test server startup
-PYTHONPATH=/path/to/lumina-docs/src python3 -m doc_manager --help
+PYTHONPATH=/path/to/doc-manager/src python3 -m doc_manager --help
 ```
 
 #### View Logs
@@ -349,7 +359,21 @@ Intelligent Operation System Requirements Document (document_root)
 
 ## Use Cases
 
-### 1. Structured Queries to Ensure Consistency
+Lumina Docs provides an easy-to-use document management system that supports integration with Claude Desktop through the MCP protocol. From a usage scenario perspective, it can provide support for leveraging large language models to handle large-scale documents in three scenarios: reading/updating/writing from scratch. Specifically:
+1. **Reading large documents**: Through structured queries, quickly locate the content you need and avoid loading the entire document at once. For example, for frontend module requirement documents, you can directly query all relevant business process descriptions and data display rules without browsing the entire document.
+2. **Updating existing content**: When modifying a functional module, you can directly query relevant business processes and data display rules to ensure modifications follow existing format and content specifications. For example, when updating system status statistics functions, you can first let the large language model directly locate the content to be modified through SQL, avoiding loading the entire document at once.
+3. **Writing new content from scratch**: When writing new business process descriptions, you can refer to existing patterns to ensure new content is consistent with existing content. For example, when writing new business process descriptions, you can first let the large language model query all existing business process descriptions, analyze their format and content, and then follow the same format and content specifications when creating new nodes.
+
+### 1. Quick Import of Existing Documents
+```python
+# Import single document directly using MCP tools through Claude
+import_markdown_file("Project Requirements.md", "project_requirements")
+
+# Batch import document directories
+import_markdown_batch(["docs/*.md", "guides/**/*.md"])
+```
+
+### 2. Structured Queries to Ensure Consistency
 ```python
 # Query all [Business Process Descriptions] as reference for new content
 nodes = db.get_nodes_by_type("business_flow")
@@ -361,14 +385,14 @@ results = db.search_nodes(
 )
 ```
 
-### 2. Consistency Check When Writing New Content
+### 3. Consistency Check When Writing New Content
 ```bash
 # Use consistency check tool
 cd examples
 python consistency_checker.py
 ```
 
-### 3. Export Documents on Demand
+### 4. Export Documents on Demand
 ```bash
 # Export complete document
 python -m doc_manager.cli export --output complete.md
@@ -449,12 +473,13 @@ python -m doc_manager.cli export --parent-id 3 --output modules.md
 ## Project Structure
 
 ```
-lumina-docs/
+doc-manager/
 ├── src/
 │   └── doc_manager/
 │       ├── __init__.py           # Module initialization
 │       ├── database.py           # SQLite database operations
 │       ├── simple_server.py      # MCP server implementation
+│       ├── markdown_parser.py    # Markdown parsing and import module
 │       ├── cli.py                # Command line tools
 │       ├── config.py             # Configuration management
 │       └── __main__.py           # Server startup entry
