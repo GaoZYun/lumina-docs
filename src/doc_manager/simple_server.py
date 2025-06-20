@@ -7,9 +7,13 @@ from typing import Any, Dict, List, Optional
 from mcp.server.fastmcp import FastMCP
 from .database import DocumentDatabase
 from .config import config
+from .markdown_parser import MarkdownImporter
 
 # Initialize the database
 db = DocumentDatabase()
+
+# Initialize Markdown importer
+markdown_importer = MarkdownImporter(db)
 
 # Create MCP server
 mcp = FastMCP(config.get_server_name())
@@ -373,6 +377,78 @@ def delete_document(document_name: str) -> str:
             return f"Document '{document_name}' not found"
     except Exception as e:
         return f"Failed to delete document: {str(e)}"
+
+@mcp.tool()
+def import_markdown_file(
+    file_path: str,
+    document_name: Optional[str] = None
+) -> str:
+    """将Markdown文件解析并导入到文档管理系统中。
+    
+    参数：
+    - file_path: Markdown文件路径（必需）
+    - document_name: 目标文档名称（可选，默认使用文件名）
+    
+    功能：
+    - 自动解析标题层次结构（#、##、###等）
+    - 提取文档标题和描述
+    - 保持内容的层级关系
+    - 创建对应的节点结构
+    
+    用途：导入单个Markdown文档，保持原有结构和层次关系。"""
+    try:
+        result = markdown_importer.import_file(file_path, document_name)
+        
+        return f"✓ 成功导入文档: {result['document_name']}\n" \
+               f"表名: {result['table_name']}\n" \
+               f"创建节点数: {result['nodes_created']}\n" \
+               f"文件路径: {result['file_path']}"
+               
+    except FileNotFoundError as e:
+        return f"错误：文件不存在 - {str(e)}"
+    except ValueError as e:
+        return f"错误：{str(e)}"
+    except Exception as e:
+        return f"导入失败：{str(e)}"
+
+@mcp.tool()
+def import_markdown_batch(
+    file_patterns: List[str],
+    skip_errors: bool = True
+) -> str:
+    """批量导入多个Markdown文件到文档管理系统中。
+    
+    参数：
+    - file_patterns: 文件路径模式列表，支持通配符如["docs/*.md"]（必需）
+    - skip_errors: 遇到错误时是否继续处理其他文件（默认True）
+    
+    功能：
+    - 支持通配符模式匹配文件
+    - 每个文件创建独立文档
+    - 自动跳过非Markdown文件
+    - 提供处理结果摘要
+    
+    用途：批量导入文档目录或多个相关文档到系统中。"""
+    try:
+        result = markdown_importer.import_batch(file_patterns, skip_errors)
+        
+        # 构建结果摘要
+        summary = f"=== 批量导入完成 ===\n"
+        summary += f"总文件数: {result['total_files']}\n"
+        summary += f"成功导入: {result['success_count']}\n"
+        summary += f"失败数量: {result['total_files'] - result['success_count']}\n\n"
+        
+        # 显示每个文件的结果
+        for file_result in result['results']:
+            if file_result['success']:
+                summary += f"✓ {file_result['file_path']} -> {file_result['document_name']} ({file_result['nodes_created']} 节点)\n"
+            else:
+                summary += f"✗ {file_result['file_path']}: {file_result['error']}\n"
+        
+        return summary
+        
+    except Exception as e:
+        return f"批量导入失败：{str(e)}"
 
 if __name__ == "__main__":
     mcp.run()

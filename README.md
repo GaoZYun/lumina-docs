@@ -423,7 +423,16 @@ nano ~/Library/Application\ Support/Claude/claude_desktop_config.json
 
 ## 使用场景
 
-### 1. 结构化查询保证一致性
+### 1. 快速导入现有文档
+```python
+# 通过Claude直接使用MCP工具导入单个文档
+import_markdown_file("项目需求.md", "project_requirements")
+
+# 批量导入文档目录
+import_markdown_batch(["docs/*.md", "guides/**/*.md"])
+```
+
+### 2. 结构化查询保证一致性
 ```python
 # 查询所有【业务流程说明】作为新内容的参考
 nodes = db.get_nodes_by_type("business_flow")
@@ -459,6 +468,12 @@ python -m doc_manager.cli export --parent-id 3 --output modules.md
 | `create_document` | 创建新文档（独立表） |
 | `get_documents_list` | 获取所有文档列表 |
 | `delete_document` | 删除文档及其数据表 |
+
+### Markdown导入工具
+| 工具名称 | 功能说明 |
+|---------|---------|
+| `import_markdown_file` | 导入单个Markdown文件，自动解析层次结构 |
+| `import_markdown_batch` | 批量导入Markdown文件，支持通配符匹配 |
 
 ### 节点管理工具
 | 工具名称 | 功能说明 |
@@ -528,7 +543,8 @@ doc-manager/
 │   └── doc_manager/
 │       ├── __init__.py           # 模块初始化
 │       ├── database.py           # SQLite数据库操作
-│       ├── server.py             # MCP服务器实现
+│       ├── simple_server.py      # MCP服务器实现
+│       ├── markdown_parser.py    # Markdown解析和导入模块
 │       ├── cli.py                # 命令行工具
 │       └── __main__.py           # 服务器启动入口
 ├── examples/
